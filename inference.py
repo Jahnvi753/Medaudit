@@ -12,6 +12,8 @@ import os
 import sys
 import textwrap
 import json
+from contextlib import redirect_stdout
+from pathlib import Path
 from datetime import datetime
 from typing import List, Optional
 
@@ -72,6 +74,35 @@ def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> No
         f"[END] success={success_str} steps={steps} score={score:.3f} rewards={rewards_str}",
         flush=True,
     )
+
+
+# ============================================================================
+# Data availability (claims.json)
+# ============================================================================
+
+CLAIMS_PATH = Path("data") / "claims.json"
+
+
+def ensure_claims_data() -> None:
+    """
+    Ensure the synthetic claims dataset exists at data/claims.json.
+    The validator may run inference without pre-generated data.
+
+    IMPORTANT: Do not print to stdout (stdout is reserved for [START]/[STEP]/[END]).
+    """
+    if CLAIMS_PATH.exists():
+        return
+
+    try:
+        import data_generator
+
+        # data_generator.save_dataset prints to stdout; redirect to stderr to keep stdout strict.
+        with redirect_stdout(sys.stderr):
+            claims = data_generator.generate_dataset(total_claims=100, fraud_ratio=0.25)
+            data_generator.save_dataset(claims, output_path=str(CLAIMS_PATH))
+    except Exception as exc:
+        # Re-raise with a clear message; caller will catch and log as failure.
+        raise RuntimeError(f"Failed to generate required dataset at {CLAIMS_PATH}: {exc}") from exc
 
 
 # ============================================================================
@@ -327,7 +358,11 @@ def evaluate_task(client: Optional[OpenAI], task_name: str) -> dict:
     Returns:
         dict with success, steps, score, rewards
     """
-    env = MedAuditEnv(task=task_name, data_path="data/claims.json")
+    # Ensure dataset exists for validator environments.
+    # Do this before constructing env (constructor loads the file).
+    ensure_claims_data()
+
+    env = MedAuditEnv(task=task_name, data_path=str(CLAIMS_PATH))
     
     rewards: List[float] = []
     step_outputs: List[dict] = []
@@ -437,6 +472,13 @@ def main():
     # Validate API configuration
     if not API_KEY:
         print("[ERROR] HF_TOKEN or API_KEY environment variable not set", file=sys.stderr, flush=True)
+        sys.exit(1)
+
+    # Ensure data exists once up-front (also handled per-task defensively).
+    try:
+        ensure_claims_data()
+    except Exception as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr, flush=True)
         sys.exit(1)
     
     # Initialize OpenAI client
