@@ -629,6 +629,14 @@ class MedAuditEnv:
             fnr_score = 1.0 - fnr
             
             score = 0.4 * accuracy + 0.3 * max(speed_score, 0) + 0.3 * fnr_score
-        
-        # Clamp to [0, 1]
-        return min(max(score, 0.0), 1.0)
+
+        # Clamp to (0, 1) for strict validator requirements.
+        # Some validators reject exactly 0.0 or 1.0.
+        # Use 1e-3 so that formatting to 3 decimals never prints 1.000 or 0.000.
+        eps = 1e-3
+        score = min(max(float(score), 0.0), 1.0)
+        if score <= 0.0:
+            return eps
+        if score >= 1.0:
+            return 1.0 - eps
+        return score
