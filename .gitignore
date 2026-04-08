@@ -11,7 +11,7 @@ venv/
 *.env
 
 # Generated data & outputs (reproducible)
-data/claims.json
+
 
 # Logs
 *.log
@@ -24,7 +24,7 @@ inference_stdout*.txt
 inference_stderr*.txt
 
 # Large local run artifacts
-audit_run_output.json
+# (intentionally not ignoring audit_run_output.json because it is required to be pushed)
 
 # Editor / IDE
 .vscode/
