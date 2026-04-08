@@ -11,6 +11,7 @@ venv/
 *.env
 
 # Generated data & outputs (reproducible)
+data/
 
 
 # Logs
