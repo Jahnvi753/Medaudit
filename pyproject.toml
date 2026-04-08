@@ -20,6 +20,7 @@ dependencies = [
 ]
 
 [project.scripts]
+server = "server.app:main"
 medauditenv-server = "server.app:main"
 
 [tool.setuptools]
