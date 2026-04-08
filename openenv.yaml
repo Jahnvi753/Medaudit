@@ -1,0 +1,72 @@
+name: MedAuditEnv
+version: 1.0.0
+description: Rural Medical Record Auditor for detecting Ayushman Bharat claim fraud
+
+author: Khushi Kumari
+license: MIT
+
+tasks:
+  - name: vital_check
+    difficulty: easy
+    description: Detect impossible vital signs (BP>220, pulse<30 or >180)
+    num_claims: 10
+    expected_score: 0.95
+    
+  - name: fraud_mix
+    difficulty: medium
+    description: Mixed fraud pattern detection across multiple indicators
+    num_claims: 20
+    expected_score: 0.91
+    
+  - name: batch_audit
+    difficulty: hard
+    description: Full batch audit with speed and accuracy requirements
+    num_claims: 50
+    expected_score: 0.88
+
+action_space:
+  type: enum
+  values:
+    - flag_anomaly
+    - approve_claim
+    - reject_claim
+    - request_clarification
+
+observation_space:
+  type: object
+  properties:
+    claim_id: string
+    patient:
+      type: object
+      properties:
+        name: string
+        age: string
+        village: string
+    vitals:
+      type: object
+      properties:
+        bp: string
+        pulse: string
+    diagnosis: string
+    medications:
+      type: array
+      items: string
+    claimed_days: integer
+    bill_amount: float
+    hospital: string
+    hospital_distance_km: integer
+    ocr_noise: boolean
+info_space:
+  type: object
+  description: Optional metadata for explainability, confidence, and episode context.
+
+reward_range:
+  min: -0.4
+  max: 0.8
+  
+tags:
+  - healthcare
+  - fraud-detection
+  - india
+  - rural-healthcare
+  - openenv

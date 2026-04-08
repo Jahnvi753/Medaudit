@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "medauditenv"
+version = "1.0.0"
+description = "Rural Medical Record Auditor - OpenEnv environment for fraud detection"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Khushi Kumari" }]
+dependencies = [
+  "pydantic==2.10.5",
+  "fastapi==0.115.6",
+  "uvicorn[standard]==0.34.0",
+  "openai>=2.7.2",
+  "requests==2.32.3",
+  "openenv-core>=0.2.0",
+]
+
+[project.scripts]
+medauditenv-server = "server.app:main"
+
+[tool.setuptools]
+py-modules = ["medaudit", "data_generator", "inference"]
+

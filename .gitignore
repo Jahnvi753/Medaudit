@@ -1,0 +1,35 @@
+# Python bytecode / cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.venv/
+
+# Environment / secrets
+.env
+*.env
+
+# Generated data & outputs (reproducible)
+data/claims.json
+
+# Logs
+*.log
+
+# Local inspection artifacts
+.pkginspect/
+
+# Captured inference outputs
+inference_stdout*.txt
+inference_stderr*.txt
+
+# Large local run artifacts
+audit_run_output.json
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
